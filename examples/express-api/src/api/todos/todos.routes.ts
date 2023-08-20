@@ -1,13 +1,12 @@
 import { Router, Response, Request } from 'express';
-import Todo from './todo.model';
+import { TodoWithId, Todos } from './todo.model';
 
 const router = Router();
 
-router.get('/', (req: Request, res: Response<Todo[]>) => {
-  res.json([{
-    content: 'Learn TypeScript',
-    done: false,
-  }]);
+router.get('/', async (req: Request, res: Response<TodoWithId[]>) => {
+  const result = Todos.find();
+  const todosFound = await result.toArray();
+  res.json(todosFound);
 });
 
 export default router;
