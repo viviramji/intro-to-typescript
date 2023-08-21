@@ -1,7 +1,5 @@
 import { Response, Request, NextFunction } from 'express';
 import { Todo, TodoWithId, Todos } from './todo.model';
-import { InsertOneResult } from 'mongodb';
-import { ZodError } from 'zod';
 
 export async function findAll(
   req: Request,
@@ -26,19 +24,15 @@ export async function createOne(
 ) {
 
   try {
-    const validateResult = await Todo.parseAsync(req.body);
-    const insertResult = await Todos.insertOne(validateResult);
+    const insertResult = await Todos.insertOne(req.body);
     
     if (!insertResult.acknowledged) throw new Error('Error inserting todo item.');
     res.status(201);
     res.json({
       _id: insertResult.insertedId,
-      ...validateResult,
+      ...req.body,
     });
   } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(422);
-    }
     next(error);
   }
 
