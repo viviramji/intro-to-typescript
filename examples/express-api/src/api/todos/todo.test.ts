@@ -10,6 +10,8 @@ beforeAll(async () => {
   } catch (error) { }
 });
 
+let id = '';
+
 describe('GET /api/v1/todos', () => {
   it('responds with a todos list', async () => {
     const response = await request(app)
@@ -35,7 +37,7 @@ describe('POST /api/v1/todos', () => {
       .expect(422);
     expect(response.body).toHaveProperty('message');
   });
-  
+
   it('responds with inserted object', async () => {
     const response = await request(app)
       .post('/api/v1/todos')
@@ -51,5 +53,39 @@ describe('POST /api/v1/todos', () => {
     expect(response.body).toHaveProperty('content');
     expect(response.body).toHaveProperty('done');
     expect(response.body.content).toBe('Learn TypeScript');
+    id = response.body._id;
   });
+
+});
+
+describe('GET /api/v1/todos/:id', () => {
+  it('responds with a single todo', async () => {
+    const response = await request(app)
+      .get(`/api/v1/todos/${id}`)
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    expect(response.body).toHaveProperty('_id');
+    expect(response.body).toHaveProperty('content');
+    expect(response.body).toHaveProperty('done');
+    expect(response.body._id).toBe(id);
+    expect(response.body.content).toBe('Learn TypeScript');
+  });
+  it('responds with a with invalid ObjectId error', (done) => {
+    request(app)
+      .get('/api/v1/todos/blabla')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(422, done);
+  });
+
+  it('responds with a with no found error', (done) => {
+    request(app)
+      .get('/api/v1/todos/64e2dcfd22a184d9ead2e623')
+      .set('Accept', 'application/json')
+      .expect('Content-Type', /json/)
+      .expect(404, done);
+  });
+
 });
