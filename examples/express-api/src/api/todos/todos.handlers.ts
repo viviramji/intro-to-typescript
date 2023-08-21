@@ -10,9 +10,8 @@ export async function findAll(
 ) {
 
   try {
-    const result = await Todos.find();
-    const todosFound = await result.toArray();
-    return res.json(todosFound);
+    const todos = await Todos.find().toArray();
+    return res.json(todos);
   } catch (error) {
     next(error);
   }
@@ -74,13 +73,32 @@ export async function updateOne(
     }, {
       returnDocument: 'after',
     });
-    
+
     if (!result.value) {
       res.status(404);
       throw new Error(`Todo with id "${req.params.id}" not found`);
     }
 
     res.json(result.value);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteOne(
+  req: Request<ParamsWithId, {}, {}>,
+  res: Response<{}>,
+  next: NextFunction,
+) {
+  try {
+    const result = await Todos.findOneAndDelete({
+      _id: new ObjectId(req.params.id),
+    });
+    if (!result.value) {
+      res.status(404);
+      throw new Error(`Todo with id "${req.params.id}" not found`);
+    }
+    res.status(204).end();
   } catch (error) {
     next(error);
   }

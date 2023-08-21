@@ -81,7 +81,7 @@ describe('GET /api/v1/todos/:id', () => {
       .expect(422, done);
   });
 
-  it('responds with a with no found error', (done) => {
+  it('responds with a no found error', (done) => {
     request(app)
       .get('/api/v1/todos/64e2dcfd22a184d9ead2e623')
       .set('Accept', 'application/json')
@@ -98,7 +98,7 @@ describe('GET /api/v1/todos/:id', () => {
         .expect(422, done);
     });
 
-    it('responds with a with no found error', (done) => {
+    it('responds with a no found error', (done) => {
       request(app)
         .put('/api/v1/todos/64e2dcfd22a184d9ead2e623')
         .set('Accept', 'application/json')
@@ -127,6 +127,39 @@ describe('GET /api/v1/todos/:id', () => {
       expect(response.body._id).toBe(id);
       expect(response.body.done).toBe(true);
       expect(response.body.content).toBe('New changes');
+    });
+  });
+
+  describe('DELETE /api/v1/todos/:id', () => {
+    it('responds with a with invalid ObjectId error', (done) => {
+      request(app)
+        .delete('/api/v1/todos/blabla')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(422, done);
+    });
+
+    it('responds with a no found error', (done) => {
+      request(app)
+        .delete('/api/v1/todos/64e2dcfd22a184d9ead2e623')
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(404, done);
+    });
+
+    it('responds with a 204 status code', (done) => {
+      request(app)
+        .delete(`/api/v1/todos/${id}`)
+        .expect(204, done);
+    });
+
+    // * if we delete ${id} we should expect an not found 404 
+    it('responds with a no found error', (done) => {
+      request(app)
+        .delete(`/api/v1/todos/${id}`)
+        .set('Accept', 'application/json')
+        .expect('Content-Type', /json/)
+        .expect(404, done);
     });
   });
 

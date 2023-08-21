@@ -35,4 +35,12 @@ router.put(
   TodoHandlers.updateOne,
 );
 
+router.delete(
+  '/:id',
+  validateRequest({
+    params: ParamsWithId,
+  }),
+  TodoHandlers.deleteOne,
+);
+
 export default router;
